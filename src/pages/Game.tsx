@@ -242,18 +242,27 @@ export default function Game() {
   }, [gameId, navigate]);
 
   useEffect(() => {
-    // If it's the AI's turn and game is still playing, make AI move
-    if (game && game.state === "playing" && game.mode === "human-vs-ai") {
+    // Unified AI driver: triggers AI moves for both modes
+    if (!game) return;
+
+    if (game.state !== "playing" || isThinking) return;
+
+    if (game.mode === "human-vs-ai") {
       const isAITurn = game.currentTurn !== game.playerColor;
-      if (isAITurn && !isThinking) {
+      if (isAITurn) {
         setIsThinking(true);
-        // Simulate AI thinking time
         setTimeout(() => {
           makeAIMove();
         }, 1000 + Math.random() * 2000); // 1-3 seconds
       }
+    } else if (game.mode === "ai-vs-ai") {
+      // In AI vs AI, the current turn is always an AI. Keep playing until finished.
+      setIsThinking(true);
+      setTimeout(() => {
+        makeAIMove();
+      }, 500 + Math.random() * 1000); // faster pace
     }
-  }, [game?.currentTurn, game?.state]);
+  }, [game?.currentTurn, game?.state, game?.mode, isThinking]);
 
   const makeAIMove = async () => {
     if (!game) return;
@@ -305,7 +314,10 @@ export default function Game() {
 
   const handleColumnClick = async (column: number) => {
     if (!game || game.state !== "playing") return;
-    
+
+    // Prevent human interference in AI vs AI mode
+    if (game.mode === "ai-vs-ai") return;
+
     const isPlayerTurn = game.currentTurn === game.playerColor;
     if (!isPlayerTurn || isThinking) return;
 
