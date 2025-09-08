@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
+import { Slider } from "@/components/ui/slider";
 
 const COLS = 5;
 const ROWS = 4;
@@ -192,10 +193,23 @@ export default function Game() {
   const [aiPreviewCol, setAiPreviewCol] = useState<number | null>(null);
   const [aiPreviewColor, setAiPreviewColor] = useState<Color | null>(null);
 
+  // Add: sound effects volume (0..1) with persistence
+  const [volume, setVolume] = useState<number>(() => {
+    const v = localStorage.getItem("sfxVolume");
+    const parsed = v ? parseFloat(v) : 0.7;
+    return Number.isFinite(parsed) ? Math.min(1, Math.max(0, parsed)) : 0.7;
+  });
+  useEffect(() => {
+    localStorage.setItem("sfxVolume", String(volume));
+  }, [volume]);
+
   // Add: simple audio synthesis for coin drop
   const audioCtxRef = useRef<AudioContext | null>(null);
   const playDrop = () => {
-    if (!soundEnabled) return;
+    // Respect mute and 0 volume
+    const effectiveVolume = soundEnabled ? volume : 0;
+    if (effectiveVolume <= 0) return;
+
     try {
       let ctx = audioCtxRef.current;
       const AC: typeof AudioContext | undefined =
@@ -217,8 +231,10 @@ export default function Game() {
       osc.frequency.setValueAtTime(700, now);
       osc.frequency.exponentialRampToValueAtTime(140, now + duration);
 
+      // Scale peak gain by volume (keep exponential safe with tiny floor)
+      const peak = Math.max(0.0001, 0.6 * effectiveVolume);
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.4, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(peak, now + 0.03);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
       osc.connect(gain);
@@ -382,9 +398,27 @@ export default function Game() {
               variant="outline"
               size="icon"
               onClick={() => setSoundEnabled(!soundEnabled)}
+              title={soundEnabled ? "Mute" : "Unmute"}
             >
               {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </Button>
+
+            {/* Add: Volume slider */}
+            <div className="flex items-center gap-2 w-36">
+              <Slider
+                value={[Math.round(volume * 100)]}
+                max={100}
+                min={0}
+                step={1}
+                onValueChange={(v) => setVolume((v?.[0] ?? 0) / 100)}
+                aria-label="Sound effects volume"
+                className="w-full"
+                disabled={!soundEnabled}
+              />
+              <span className="text-xs w-10 text-right select-none">
+                {Math.round(volume * 100)}%
+              </span>
+            </div>
             
             <Button
               variant="outline"
