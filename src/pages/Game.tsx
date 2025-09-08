@@ -195,13 +195,18 @@ export default function Game() {
                               onClick={() => handleColumnClick(col)}
                               whileHover={{ scale: cell === "" ? 1.05 : 1 }}
                               whileTap={{ scale: 0.95 }}
-                              initial={isLastMove ? { scale: 0, y: -100 } : {}}
-                              animate={isLastMove ? { scale: 1, y: 0 } : {}}
-                              transition={{ 
-                                type: "spring", 
-                                stiffness: 300, 
-                                damping: 20 
-                              }}
+                              // Enhanced drop animation for the last placed piece
+                              initial={isLastMove ? { y: -300, scale: 0.95 } : {}}
+                              animate={
+                                isLastMove
+                                  ? { y: [-300, 12, -6, 0], scale: [0.95, 1.02, 0.995, 1] }
+                                  : {}
+                              }
+                              transition={
+                                isLastMove
+                                  ? { duration: 0.6, ease: ["easeOut", "easeInOut", "easeOut"], times: [0, 0.75, 0.9, 1] }
+                                  : {}
+                              }
                             >
                               {cell !== "" && (
                                 <div className={`
