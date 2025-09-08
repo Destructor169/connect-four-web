@@ -8,11 +8,43 @@ import { Play, Trophy, Users, Bot, Gamepad2, Zap, Target, Crown } from "lucide-r
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 
 export default function Landing() {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const userGames = useQuery(api.games.getUserGames);
+
+  // Add: dark mode state + initialization
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const enableDark = stored ? stored === "dark" : prefersDark;
+    if (enableDark) {
+      document.documentElement.classList.add("dark");
+      setDarkMode(true);
+    } else {
+      document.documentElement.classList.remove("dark");
+      setDarkMode(false);
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => {
+      const next = !prev;
+      if (next) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+      return next;
+    });
+  };
 
   const stats = userGames ? {
     totalGames: userGames.length,
@@ -25,6 +57,20 @@ export default function Landing() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
+        {/* Add: top-right dark mode toggle for quick access */}
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Toggle dark mode"
+            onClick={toggleDarkMode}
+            className="rounded-full"
+            title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          </Button>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
