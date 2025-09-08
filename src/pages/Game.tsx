@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
@@ -190,6 +190,45 @@ export default function Game() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isThinking, setIsThinking] = useState(false);
 
+  // Add: simple audio synthesis for coin drop
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const playDrop = () => {
+    if (!soundEnabled) return;
+    try {
+      let ctx = audioCtxRef.current;
+      const AC: typeof AudioContext | undefined =
+        (window as any).AudioContext || (window as any).webkitAudioContext;
+      if (!ctx && AC) {
+        ctx = new AC();
+        audioCtxRef.current = ctx;
+      }
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      const duration = 0.25;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      // A quick descending blip for a "coin drop" vibe
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(700, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + duration);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.4, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + duration);
+    } catch {
+      // no-op
+    }
+  };
+
   const game = useQuery(api.games.getGame, gameId ? { gameId } : "skip");
   const makeMove = useMutation(api.games.makeMove);
 
@@ -237,9 +276,8 @@ export default function Game() {
           column: chosenCol,
         });
 
-        if (soundEnabled) {
-          // Play drop sound
-        }
+        // Play drop sound on AI move
+        playDrop();
       }
     } catch (error) {
       console.error("AI move error:", error);
@@ -262,9 +300,8 @@ export default function Game() {
         column,
       });
       
-      if (soundEnabled) {
-        // Play drop sound
-      }
+      // Play drop sound on human move
+      playDrop();
     } catch (error) {
       console.error("Move error:", error);
       toast.error("Invalid move");
