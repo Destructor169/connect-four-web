@@ -189,6 +189,8 @@ export default function Game() {
   const { user } = useAuth();
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isThinking, setIsThinking] = useState(false);
+  const [aiPreviewCol, setAiPreviewCol] = useState<number | null>(null);
+  const [aiPreviewColor, setAiPreviewColor] = useState<Color | null>(null);
 
   // Add: simple audio synthesis for coin drop
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -263,26 +265,40 @@ export default function Game() {
       const best = findBestMove(game.board as Board, aiColor);
       let chosenCol: number | null = best;
 
-      // Fallback: any valid move if search fails (shouldn't happen)
+      // Fallback: any valid move if search fails
       if (chosenCol === null) {
         const fallback = getValidMoves(game.board as Board);
         chosenCol = fallback.length ? fallback[0] : null;
       }
 
       if (chosenCol !== null) {
-        await makeMove({
-          gameId: game.gameId,
-          color: aiColor,
-          column: chosenCol,
-        });
+        // Add: preview the AI move with a short drop animation before committing
+        setAiPreviewColor(aiColor);
+        setAiPreviewCol(chosenCol);
 
-        // Play drop sound on AI move
-        playDrop();
+        setTimeout(async () => {
+          try {
+            await makeMove({
+              gameId: game.gameId,
+              color: aiColor,
+              column: chosenCol as number,
+            });
+            playDrop();
+          } catch (error) {
+            console.error("AI move error:", error);
+            toast.error("AI move failed");
+          } finally {
+            setAiPreviewCol(null);
+            setAiPreviewColor(null);
+            setIsThinking(false);
+          }
+        }, 600); // brief preview window
+      } else {
+        setIsThinking(false);
       }
     } catch (error) {
       console.error("AI move error:", error);
       toast.error("AI move failed");
-    } finally {
       setIsThinking(false);
     }
   };
@@ -331,6 +347,9 @@ export default function Game() {
       : isPlayerTurn 
         ? "Your turn" 
         : "AI's turn";
+
+  // Add: compute preview target row for ghost drop
+  const previewRow = aiPreviewCol !== null ? getAvailableRow(game.board as Board, aiPreviewCol) : -1;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
@@ -386,7 +405,10 @@ export default function Game() {
                 <div className="bg-blue-600 rounded-lg p-4 shadow-lg">
                   <div className="grid grid-cols-5 gap-2">
                     {Array.from({ length: 5 }, (_, col) => (
-                      <div key={col} className="flex flex-col gap-2">
+                      <div 
+                        key={col} 
+                        className={`flex flex-col gap-2 ${aiPreviewCol === col ? "animate-pulse" : ""}`}
+                      >
                         {Array.from({ length: 4 }, (_, row) => {
                           const cell = game.board[row][col];
                           const isLastMove = game.lastMove?.row === row && game.lastMove?.column === col;
@@ -396,12 +418,14 @@ export default function Game() {
                             <motion.div
                               key={`${row}-${col}`}
                               className={`
+                                relative
                                 aspect-square rounded-full border-2 border-blue-800 cursor-pointer
                                 ${cell === "" ? "bg-white" : ""}
                                 ${cell === "Y" ? "bg-yellow-400 shadow-lg" : ""}
                                 ${cell === "R" ? "bg-red-500 shadow-lg" : ""}
                                 ${isLastMove ? "ring-4 ring-blue-300 ring-opacity-75" : ""}
                                 ${isWinning ? "ring-4 ring-green-400 ring-opacity-75 animate-pulse" : ""}
+                                ${aiPreviewCol === col ? "outline outline-2 outline-blue-300/40" : ""}
                               `}
                               onClick={() => handleColumnClick(col)}
                               whileHover={{ scale: cell === "" ? 1.05 : 1 }}
@@ -427,6 +451,27 @@ export default function Game() {
                                   shadow-inner
                                 `} />
                               )}
+
+                              {/* AI preview ghost piece */}
+                              {aiPreviewCol === col &&
+                                previewRow === row &&
+                                cell === "" &&
+                                game.state === "playing" &&
+                                aiPreviewColor && (
+                                  <motion.div
+                                    initial={{ y: -300, opacity: 0.8, scale: 0.95 }}
+                                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.55, ease: "easeOut" }}
+                                    className={`
+                                      absolute inset-0 rounded-full pointer-events-none
+                                      ${aiPreviewColor === "Y" 
+                                        ? "bg-gradient-to-br from-yellow-200 to-yellow-400" 
+                                        : "bg-gradient-to-br from-red-300 to-red-500"}
+                                      ring-4 ring-white/40
+                                    `}
+                                    style={{ zIndex: 5 }}
+                                  />
+                                )}
                             </motion.div>
                           );
                         })}
