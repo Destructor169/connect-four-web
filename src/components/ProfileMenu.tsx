@@ -32,28 +32,31 @@ export default function ProfileMenu({ compact }: Props) {
           className={`flex items-center gap-3 rounded-full border px-3 py-1.5 hover:bg-muted transition-colors ${compact ? "text-sm" : ""}`}
           aria-label="Open profile menu"
         >
-          {/* Avatar with gradient ring + badge */}
+          {/* Avatar with gradient ring and game icon badge */}
           <span className="relative inline-flex">
-            <span className="p-[2px] rounded-full bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500">
-              <Avatar className="h-8 w-8 rounded-full ring-2 ring-background bg-background transition-shadow hover:shadow-[0_0_0_3px_rgba(99,102,241,0.35)]">
-                <AvatarImage src={user?.image ?? ""} alt={name} />
-                <AvatarFallback className="bg-muted">
-                  <Gamepad2 className="h-4 w-4 text-muted-foreground" />
-                </AvatarFallback>
-              </Avatar>
-            </span>
-            {/* Small connect-4/game badge */}
-            <span className="absolute -bottom-0 -right-0 h-3.5 w-3.5 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 border border-background grid place-items-center shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-white/80" />
+            <span className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 blur-[6px] opacity-50" aria-hidden />
+            <Avatar className="h-9 w-9 rounded-full ring-2 ring-white dark:ring-zinc-900">
+              <AvatarImage src={user?.image ?? ""} alt={name} />
+              <AvatarFallback className="bg-gradient-to-br from-yellow-400 to-yellow-600 text-zinc-900 font-bold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            {/* Connect-4 badge */}
+            <span
+              className="absolute -bottom-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full border bg-background shadow"
+              aria-hidden
+            >
+              <Gamepad2 className="h-3.5 w-3.5 text-purple-600" />
             </span>
           </span>
-          <div className="hidden sm:block text-left">
-            <div className="font-semibold leading-tight flex items-center gap-1">
-              <User2 className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="truncate max-w-[140px]">{name}</span>
-            </div>
-            <div className="text-xs text-muted-foreground truncate max-w-[160px]">{email}</div>
+
+          {/* Text block (name + email) */}
+          <div className="hidden sm:block text-left max-w-[200px]">
+            <div className="font-semibold leading-tight truncate">{name}</div>
+            <div className="text-xs text-muted-foreground truncate">{email}</div>
           </div>
+
+          {/* On small screens, show initials only */}
           <span className="sm:hidden font-semibold">{initials}</span>
         </button>
       </DropdownMenuTrigger>

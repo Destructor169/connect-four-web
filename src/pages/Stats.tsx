@@ -42,6 +42,11 @@ export default function StatsPage() {
     });
   }, [games]);
 
+  const history = useMemo(() => {
+    if (!games) return [];
+    return [...games].sort((a, b) => b._creationTime - a._creationTime);
+  }, [games]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
@@ -140,6 +145,62 @@ export default function StatsPage() {
                 </span>
               </div>
               <Button className="w-full mt-4" onClick={() => navigate("/setup")}>Start a New Game</Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Game History List */}
+        <div className="mt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Game History</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {history.length === 0 && (
+                <p className="text-sm text-muted-foreground">No games yet.</p>
+              )}
+              {history.map((g, idx) => {
+                const isDraw = g.result === "draw";
+                const isWin = g.result?.includes(g.playerColor);
+                const badgeVariant =
+                  isDraw ? "outline" : isWin ? "default" : "destructive";
+                const label = isDraw ? "Draw" : isWin ? "Win" : "Loss";
+                const when = new Date(g._creationTime).toLocaleString();
+
+                return (
+                  <div
+                    key={g.gameId ?? idx}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className={`h-3.5 w-3.5 rounded-full ${
+                          g.playerColor === "Y" ? "bg-yellow-400" : "bg-red-500"
+                        }`}
+                        title={`Your color: ${g.playerColor === "Y" ? "Yellow" : "Red"}`}
+                      />
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={badgeVariant as any}>{label}</Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {g.mode === "ai-vs-ai" ? "AI vs AI" : "vs AI"}
+                          </span>
+                        </div>
+                        <div className="text-sm truncate">
+                          {when}
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate(`/game/${g.gameId}`)}
+                    >
+                      View
+                    </Button>
+                  </div>
+                );
+              })}
             </CardContent>
           </Card>
         </div>
