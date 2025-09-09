@@ -255,3 +255,25 @@ When using convex, make sure:
 - This includes importing generated files like `@/convex/_generated/server`, `@/convex/_generated/api`
 - Remember to import functions like useQuery, useMutation, useAction, etc. from `convex/react`
 - NEVER have return type validators.
+
+## Live Demo
+
+- Deployed: https://connect-four-web.vly.site
+
+[![Open Website](https://img.shields.io/badge/Live%20Site-connect--four--web.vly.site-4f46e5?logo=vercel&logoColor=white)](https://connect-four-web.vly.site)
+
+## Screenshots
+
+> A quick look at the app's key screens.
+
+### Landing
+![Landing](https://harmless-tapir-303.convex.cloud/api/storage/73fafa1a-e1a2-48a6-89e3-a5f012336225)
+
+### Game Setup
+![Game Setup 1](https://harmless-tapir-303.convex.cloud/api/storage/4e18cfd1-4381-44ba-9471-d3521c925211)
+![Game Setup 2](https://harmless-tapir-303.convex.cloud/api/storage/f132e65b-f827-4231-893e-46c5f35f8af7)
+
+### Gameplay
+![Gameplay — Start](https://harmless-tapir-303.convex.cloud/api/storage/1fabf24f-80b0-4f09-b56a-d32d21d20dd6)
+![Gameplay — In Progress](https://harmless-tapir-303.convex.cloud/api/storage/3d6bbd5a-c88a-46fe-ae1b-d3444c6126dd)
+![Gameplay — Board View](https://harmless-tapir-303.convex.cloud/api/storage/0216a2d4-a038-49ff-b888-9512681a6a6a)
