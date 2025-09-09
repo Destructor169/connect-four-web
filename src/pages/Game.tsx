@@ -10,6 +10,7 @@ import { ArrowLeft, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { Slider } from "@/components/ui/slider";
+import ProfileMenu from "@/components/ProfileMenu";
 
 const COLS = 5;
 const ROWS = 4;
@@ -392,7 +393,7 @@ export default function Game() {
             <ArrowLeft className="h-4 w-4" />
             Back to Menu
           </Button>
-          
+
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
@@ -428,6 +429,8 @@ export default function Game() {
               <RotateCcw className="h-4 w-4" />
               New Game
             </Button>
+
+            <ProfileMenu compact />
           </div>
         </div>
 

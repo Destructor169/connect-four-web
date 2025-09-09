@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Play, Users, Bot } from "lucide-react";
 import { toast } from "sonner";
+import ProfileMenu from "@/components/ProfileMenu";
 
 export default function GameSetup() {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ export default function GameSetup() {
             <ArrowLeft className="h-4 w-4" />
             Back to Menu
           </Button>
+          <ProfileMenu compact />
         </div>
 
         <div className="max-w-2xl mx-auto">

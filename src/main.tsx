@@ -13,6 +13,7 @@ import GameSetup from "./pages/GameSetup.tsx";
 import Game from "./pages/Game.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import "./types/global.d.ts";
+import Stats from "./pages/Stats.tsx";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
@@ -50,6 +51,7 @@ createRoot(document.getElementById("root")!).render(
             <Route path="/" element={<Landing />} />
             <Route path="/setup" element={<GameSetup />} />
             <Route path="/game/:gameId" element={<Game />} />
+            <Route path="/stats" element={<Stats />} />
             <Route path="/auth" element={<AuthPage redirectAfterAuth="/" />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

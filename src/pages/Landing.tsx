@@ -10,6 +10,7 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
+import ProfileMenu from "@/components/ProfileMenu";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -59,16 +60,19 @@ export default function Landing() {
       <div className="container mx-auto px-4 py-16">
         {/* Add: top-right dark mode toggle for quick access */}
         <div className="flex justify-end mb-4">
-          <Button
-            variant="outline"
-            size="icon"
-            aria-label="Toggle dark mode"
-            onClick={toggleDarkMode}
-            className="rounded-full"
-            title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              aria-label="Toggle dark mode"
+              onClick={toggleDarkMode}
+              className="rounded-full"
+              title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+            <ProfileMenu compact />
+          </div>
         </div>
 
         <motion.div
