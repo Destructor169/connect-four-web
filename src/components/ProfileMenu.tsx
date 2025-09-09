@@ -32,14 +32,20 @@ export default function ProfileMenu({ compact }: Props) {
           className={`flex items-center gap-3 rounded-full border px-3 py-1.5 hover:bg-muted transition-colors ${compact ? "text-sm" : ""}`}
           aria-label="Open profile menu"
         >
-          <span className="relative">
-            <Avatar className="h-8 w-8">
-              {/* If you add user.image later, it will render */}
-              <AvatarImage src={user?.image ?? ""} alt={name} />
-              <AvatarFallback>
-                <Gamepad2 className="h-4 w-4" />
-              </AvatarFallback>
-            </Avatar>
+          {/* Avatar with gradient ring + badge */}
+          <span className="relative inline-flex">
+            <span className="p-[2px] rounded-full bg-gradient-to-tr from-blue-500 via-purple-500 to-pink-500">
+              <Avatar className="h-8 w-8 rounded-full ring-2 ring-background bg-background transition-shadow hover:shadow-[0_0_0_3px_rgba(99,102,241,0.35)]">
+                <AvatarImage src={user?.image ?? ""} alt={name} />
+                <AvatarFallback className="bg-muted">
+                  <Gamepad2 className="h-4 w-4 text-muted-foreground" />
+                </AvatarFallback>
+              </Avatar>
+            </span>
+            {/* Small connect-4/game badge */}
+            <span className="absolute -bottom-0 -right-0 h-3.5 w-3.5 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-500 border border-background grid place-items-center shadow-sm">
+              <span className="h-2 w-2 rounded-full bg-white/80" />
+            </span>
           </span>
           <div className="hidden sm:block text-left">
             <div className="font-semibold leading-tight flex items-center gap-1">
