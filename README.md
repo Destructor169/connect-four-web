@@ -262,6 +262,10 @@ When using convex, make sure:
 
 [![Open Website](https://img.shields.io/badge/Live%20Site-connect--four--web.vly.site-4f46e5?logo=vercel&logoColor=white)](https://connect-four-web.vly.site)
 
+Hosted on Fly.io
+
+[![Live on Fly.io](https://img.shields.io/badge/Live%20on-Fly.io-5b21b6?logo=globe&logoColor=white)](https://connect-four-web.vly.site)
+
 ## Screenshots
 
 > A quick look at the app's key screens.
